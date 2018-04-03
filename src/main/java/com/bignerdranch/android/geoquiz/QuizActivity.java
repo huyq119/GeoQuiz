@@ -1,5 +1,6 @@
 package com.bignerdranch.android.geoquiz;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,7 @@ public class QuizActivity extends AppCompatActivity {
     private Button mTrueButton;
     private Button mFalseButton;
     private Button mNextButton;
+    private Button mCheatButton;
     private TextView mQuestionTextView;
     private boolean isoncl=true;
 
@@ -26,7 +28,7 @@ public class QuizActivity extends AppCompatActivity {
         new Question(R.string.question_mideast,false),
         new Question(R.string.question_africa,false),
         new Question(R.string.question_americas,true),
-        new Question(R.string.question_asin,true)
+        new Question(R.string.question_asia,true)
     };
     private int mCurrentIndex = 0;
     @Override
@@ -38,7 +40,7 @@ public class QuizActivity extends AppCompatActivity {
         if (savedInstanceState != null){
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX,0);
         }
-
+//      练习查错
         mQuestionTextView = findViewById(R.id.question_text_view);
         mTrueButton = findViewById(R.id.true_button);
         mTrueButton.setOnClickListener(new View.OnClickListener() {
@@ -64,9 +66,22 @@ public class QuizActivity extends AppCompatActivity {
         mNextButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+//                诊断应用异常
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
                 updateQuestion();
                 isoncl = true;
+            }
+        });
+        mCheatButton = findViewById(R.id.cheat_button);
+        mCheatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Start CheatActivity
+                boolean answerIsTrue = mQuestionBank[mCurrentIndex]
+                    .isAnswerTrue();
+                Intent intent = CheatActivity.newIntent(QuizActivity.this,
+                    answerIsTrue);
+                startActivity(intent);
             }
         });
         updateQuestion();
@@ -88,7 +103,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 //    通过onSaveInstanceState保存数据,使屏幕翻转时保存mCurrentIndex的值
     @Override
-    public void onSaveIn stanceState(Bundle savedInstanceState){
+    public void onSaveInstanceState(Bundle savedInstanceState){
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG,"onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX,mCurrentIndex);
